@@ -229,6 +229,18 @@ MORE :
   < ~[] >
 }
 
+TOKEN:
+{
+    < ATTRIBUTE:
+        <IDENTIFIER> (":" <IDENTIFIER>)? "="
+        ( <STRING_LITERAL>
+         | "'" (~["'"])* "'"
+         | "\"" (~["\""])* "\""
+         | "{" (~["{","}"])* "}"
+        )
+    >
+}
+
 /* RESERVED WORDS AND LITERALS */
 
 TOKEN :
@@ -2754,6 +2766,8 @@ Statement Statement():
 	  ret = SynchronizedStatement()
 	|
 	  ret = TryStatement()
+	|
+	  ret = JSXElement()
   )
   { return ret; }
 }
@@ -3176,6 +3190,34 @@ TryStmt TryStatement():
   { return new TryStmt(line, column, token.endLine, token.endColumn, resources, tryBlock, catchs, finallyBlock); }
 }
 
+Statement JSXElement():
+{
+	List stmts;
+	int beginLine;
+	int beginColumn;
+}
+{
+   "<" {beginLine=token.beginLine; beginColumn=token.beginColumn;}
+   <IDENTIFIER> [("." | ":") <IDENTIFIER>] JSXAttributes()
+   (
+      "/>"
+      |
+       (">" (JSXChild())* "</" <IDENTIFIER>  [("." | ":") <IDENTIFIER>] ">")
+
+   )
+  { return new BlockStmt(beginLine, beginColumn, token.endLine, token.endColumn, new LinkedList()); }
+}
+
+void JSXChild(): {}
+{
+   (<~["{","}","<",">"]>)+
+   | JSXElement()
+}
+
+void JSXAttributes() : {}
+{
+    (<ATTRIBUTE>)*
+}
 
 List ResourceSpecification() :
 {
