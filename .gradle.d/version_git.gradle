@@ -1,0 +1,8 @@
+task configured {
+    def ver = 'git describe --tags --always'.execute().text.replaceAll('\\r|\\n', '').replaceFirst('-', '.')
+    def branch = 'git rev-parse --abbrev-ref HEAD'.execute().text.replaceAll('\\r|\\n', '')
+    project.version += project.version.isEmpty() ? '' : '-'
+    project.version += (branch == null || branch.isEmpty() || branch == 'master') ? '' : (branch + '-')
+    project.version += (ver == null) || (ver.isEmpty()) ? '' : ver
+    writeVersion(project.version)
+}

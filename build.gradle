@@ -1,0 +1,53 @@
+buildscript {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+
+    dependencies {
+         classpath 'ca.coglinc:javacc-gradle-plugin:2.3.1'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'ca.coglinc.javacc'
+
+apply from: 'project.gradle'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+task getDependencies(type: Copy) {
+    from sourceSets.main.runtimeClasspath
+    into 'build/lib'
+}
+
+def writeVersion(String version) {
+    ext.versionfile = new File('build.number')
+    def date = new Date().format('E, MMM d yyyy HH:mm:ssZ')
+    versionfile.text = 'Build at ' + date + '\n'
+    versionfile.text += 'Build revision ' + version
+}
+
+task version {
+    println '\'' + project.version + '\''
+}
+
+jar {
+    manifest.attributes('Implementation-Version': project.version);
+}
+
+clean {
+    delete "logs"
+}
+
+task distSources(type: Zip) {
+    classifier = 'src'
+    from projectDir
+    include 'src/**/*', '*.gradle', 'README.md'
+}
+
+jar.finalizedBy(project.tasks.getDependencies)

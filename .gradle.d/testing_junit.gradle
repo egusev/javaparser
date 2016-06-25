@@ -1,0 +1,18 @@
+apply plugin: 'base'
+
+dependencies {
+    testCompile 'junit:junit:4+'
+}
+
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+        afterSuite { desc, result ->
+            if (!desc.parent) { // will match the outermost suite
+                println ''
+                println "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+                println ''
+            }
+        }
+    }
+}
