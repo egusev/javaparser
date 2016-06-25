@@ -42,6 +42,7 @@ jar {
 
 clean {
     delete "logs"
+    delete "target"
 }
 
 task distSources(type: Zip) {
