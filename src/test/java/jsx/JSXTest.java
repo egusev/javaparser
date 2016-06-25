@@ -2,86 +2,38 @@ package jsx;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.tngtech.java.junit.dataprovider.DataProvider;
+import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.io.InputStream;
 
+@RunWith(DataProviderRunner.class)
 public class JSXTest {
 
     @Test
-    public void testEmptyJava() throws Exception {
-        try (InputStream in = JSXTest.class.getResourceAsStream("EmptyJava.java")) {
-            CompilationUnit cu = JavaParser.parse(in);
-        }
-    }
-
-    @Test
-    public void testEmptyJSX1() throws Exception {
-        try (InputStream in = JSXTest.class.getResourceAsStream("EmptyJSX1.java")) {
-            CompilationUnit cu = JavaParser.parse(in);
-        }
-    }
-
-    @Test
-    public void testEmptyJSX2() throws Exception {
-        try (InputStream in = JSXTest.class.getResourceAsStream("EmptyJSX2.java")) {
-            CompilationUnit cu = JavaParser.parse(in);
-        }
-    }
-
-
-    @Test
-    public void testEmptyJSX3() throws Exception {
-        try (InputStream in = JSXTest.class.getResourceAsStream("EmptyJSX3.java")) {
-            CompilationUnit cu = JavaParser.parse(in);
-        }
-    }
-
-    @Test
-    public void testEmptyJSX4() throws Exception {
-        try (InputStream in = JSXTest.class.getResourceAsStream("EmptyJSX4.java")) {
-            CompilationUnit cu = JavaParser.parse(in);
-        }
-    }
-
-    @Test
-    public void testNameSpaceEmptyJSX1() throws Exception {
-        try (InputStream in = JSXTest.class.getResourceAsStream("NameSpaceEmptyJSX1.java")) {
-            CompilationUnit cu = JavaParser.parse(in);
-        }
-    }
-
-    @Test
-    public void testNameSpaceEmptyJSX2() throws Exception {
-        try (InputStream in = JSXTest.class.getResourceAsStream("NameSpaceEmptyJSX2.java")) {
-            CompilationUnit cu = JavaParser.parse(in);
-        }
-    }
-
-    @Test
-    public void testAttributesJSX1() throws Exception {
-        try (InputStream in = JSXTest.class.getResourceAsStream("AttributesJSX1.java")) {
-            CompilationUnit cu = JavaParser.parse(in);
-        }
-    }
-
-    @Test
-    public void testAttributesJSX2() throws Exception {
-        try (InputStream in = JSXTest.class.getResourceAsStream("AttributesJSX2.java")) {
-            CompilationUnit cu = JavaParser.parse(in);
-        }
-    }
-
-    @Test
-    public void testAttributesJSX3() throws Exception {
-        try (InputStream in = JSXTest.class.getResourceAsStream("AttributesJSX3.java")) {
-            CompilationUnit cu = JavaParser.parse(in);
-        }
-    }
-
-    @Test
-    public void testAttributesJSX4() throws Exception {
-        try (InputStream in = JSXTest.class.getResourceAsStream("AttributesJSX4.java")) {
+    @DataProvider(value = {
+            "EmptyJava.java",
+            "EmptyJSX1.java",
+            "EmptyJSX2.java",
+            "EmptyJSX3.java",
+            "NameSpaceEmptyJSX1.java",
+            "NameSpaceEmptyJSX2.java",
+            "AttributesJSX1.java",
+            "AttributesJSX2.java",
+            "AttributesJSX3.java",
+            "AttributesJSX4.java",
+            "ChildrenJSX1.java",
+            "ChildrenJSX2.java",
+            "ChildrenJSX3.java",
+            "ChildrenJSX4.java",
+            "JSX1.java",
+            "Test.java"
+    })
+    public void testSuccess(String resource) throws Exception {
+        try (InputStream in = JSXTest.class.getResourceAsStream(resource)) {
             CompilationUnit cu = JavaParser.parse(in);
         }
     }
@@ -103,20 +55,6 @@ public class JSXTest {
     @Test(expected = com.github.javaparser.ParseException.class)
     public void testFailedEmptyJSX3() throws Exception {
         try (InputStream in = JSXTest.class.getResourceAsStream("FailedEmptyJSX3.java")) {
-            CompilationUnit cu = JavaParser.parse(in);
-        }
-    }
-
-    @Test
-    public void testJSX1() throws Exception {
-        try (InputStream in = JSXTest.class.getResourceAsStream("JSX1.java")) {
-            CompilationUnit cu = JavaParser.parse(in);
-        }
-    }
-
-    @Test
-    public void testTest() throws Exception {
-        try (InputStream in = JSXTest.class.getResourceAsStream("Test.java")) {
             CompilationUnit cu = JavaParser.parse(in);
         }
     }

@@ -2,6 +2,7 @@ apply plugin: 'base'
 
 dependencies {
     testCompile 'junit:junit:4+'
+    testCompile 'com.tngtech.java:junit-dataprovider:1.11.0'
 }
 
 test {
