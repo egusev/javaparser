@@ -229,18 +229,6 @@ MORE :
   < ~[] >
 }
 
-TOKEN:
-{
-    < ATTRIBUTE:
-        <IDENTIFIER> (":" <IDENTIFIER>)? "="
-        ( <STRING_LITERAL>
-         | "'" (~["'"])* "'"
-         | "\"" (~["\""])* "\""
-         | "{" (~["{","}"])* "}"
-        )
-    >
-}
-
 /* RESERVED WORDS AND LITERALS */
 
 TOKEN :
@@ -383,6 +371,14 @@ TOKEN :
           )
       )*
       "\""
+  >
+|
+  < JSX_SINGLE_STRING:
+    "'" (~["'"])* "'"
+  >
+|
+  < JSX_DOUBLE_STRING:
+    "\"" (~["\""])* "\""
   >
 }
 
@@ -3210,13 +3206,143 @@ Statement JSXElement():
 
 void JSXChild(): {}
 {
-   (<~["{","}","<",">"]>)+
+    JSXTextNode()
    | JSXElement()
+   | JSXExpression()
+}
+
+void JSXTextNode(): {}
+{
+  (
+      <IDENTIFIER>
+    | <LONG_LITERAL>
+    | <INTEGER_LITERAL>
+    | <FLOATING_POINT_LITERAL>
+    | <CHARACTER_LITERAL>
+    | <STRING_LITERAL>
+    | <LPAREN>
+    | <RPAREN>
+    | <LBRACKET>
+    | <RBRACKET>
+    | <SEMICOLON>
+    | <COMMA>
+    | <DOT>
+    | <AT>
+    | <ASSIGN>
+    | <BANG>
+    | <TILDE>
+    | <HOOK>
+    | <COLON>
+    | <EQ>
+    | <LE>
+    | <GE>
+    | <NE>
+    | <SC_OR>
+    | <SC_AND>
+    | <INCR>
+    | <DECR>
+    | <PLUS>
+    | <MINUS>
+    | <STAR>
+    | <SLASH>
+    | <BIT_AND>
+    | <BIT_OR>
+    | <XOR>
+    | <REM>
+    | <LSHIFT>
+    | <PLUSASSIGN>
+    | <MINUSASSIGN>
+    | <STARASSIGN>
+    | <SLASHASSIGN>
+    | <ANDASSIGN>
+    | <ORASSIGN>
+    | <XORASSIGN>
+    | <REMASSIGN>
+    | <ELLIPSIS>
+    | <DOUBLECOLON>
+    | < ABSTRACT>
+    | < ASSERT>
+    | < BOOLEAN>
+    | < BREAK>
+    | < BYTE>
+    | < CASE>
+    | < CATCH>
+    | < CHAR>
+    | < CLASS>
+    | < CONST>
+    | < CONTINUE>
+    | < _DEFAULT>
+    | < DO>
+    | < DOUBLE>
+    | < ELSE>
+    | < ENUM>
+    | < EXTENDS>
+    | < FALSE>
+    | < FINAL>
+    | < FINALLY>
+    | < FLOAT>
+    | < FOR>
+    | < GOTO>
+    | < IF>
+    | < IMPLEMENTS>
+    | < IMPORT>
+    | < INSTANCEOF>
+    | < INT>
+    | < INTERFACE>
+    | < LONG>
+    | < NATIVE>
+    | < NEW>
+    | < NULL>
+    | < PACKAGE>
+    | < PRIVATE>
+    | < PROTECTED>
+    | < PUBLIC>
+    | < RETURN>
+    | < SHORT>
+    | < STATIC>
+    | < STRICTFP>
+    | < SUPER>
+    | < SWITCH>
+    | < SYNCHRONIZED>
+    | < THIS>
+    | < THROW>
+    | < THROWS>
+    | < TRANSIENT>
+    | < TRUE>
+    | < TRY>
+    | < VOID>
+    | < VOLATILE>
+    | < WHILE>
+    | <~["{","}","<",">"]>
+  )+
 }
 
 void JSXAttributes() : {}
 {
-    (<ATTRIBUTE>)*
+    (JSXAttribute())*
+}
+
+void JSXAttribute() : {}
+{
+    JSXAttributeName() <ASSIGN>
+    (
+        <STRING_LITERAL>
+      | <CHARACTER_LITERAL>
+      | <JSX_SINGLE_STRING>
+      | <JSX_DOUBLE_STRING>
+      | JSXExpression()
+    )
+}
+
+void JSXAttributeName(): {}
+{
+    LOOKAHEAD(3) (<IDENTIFIER> <COLON> <IDENTIFIER>)
+    | <IDENTIFIER> (<DOT> <IDENTIFIER>)*
+}
+
+void JSXExpression() : {}
+{
+    (<LBRACE> Expression() <RBRACE>)
 }
 
 List ResourceSpecification() :
