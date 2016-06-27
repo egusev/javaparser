@@ -29,6 +29,7 @@ public class JSXTest {
             "ChildrenJSX2.java",
             "ChildrenJSX3.java",
             "ChildrenJSX4.java",
+            "TextNodeJSX1.java",
             "JSX1.java",
             "Test.java"
     })
