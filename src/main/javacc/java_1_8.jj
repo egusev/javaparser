@@ -3191,14 +3191,20 @@ Statement JSXElement():
 	List stmts;
 	int beginLine;
 	int beginColumn;
+	StringBuilder openTag = new StringBuilder();
+	StringBuilder closeTag = new StringBuilder();
 }
 {
    "<" {beginLine=token.beginLine; beginColumn=token.beginColumn;}
-   <IDENTIFIER> [("." | ":") <IDENTIFIER>] JSXAttributes()
+   <IDENTIFIER> { openTag.append(token.image); } [("." | ":") { openTag.append(token.image); } <IDENTIFIER> { openTag.append(token.image); }] JSXAttributes()
    (
       "/>"
       |
-       (">" (JSXChild())* "</" <IDENTIFIER>  [("." | ":") <IDENTIFIER>] ">")
+       (">" (JSXChild())* "</"<IDENTIFIER> { closeTag.append(token.image); } [("." | ":") { closeTag.append(token.image); } <IDENTIFIER> { closeTag.append(token.image); }] ">") {
+        if(!openTag.toString().equals(closeTag.toString())) {
+            throw new ParseException("Open and close tags should match, but open tag was " + openTag.toString() + " and close tag was " + closeTag.toString());
+        }
+       }
 
    )
   { return new BlockStmt(beginLine, beginColumn, token.endLine, token.endColumn, new LinkedList()); }
