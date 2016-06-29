@@ -1,6 +1,6 @@
 package jsx;
 
-public class ChildrenJSX4 {
+public class ChildrenJSX2 {
     public void main(String[] arg) {
         <Tag>
                 Text Node
