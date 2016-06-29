@@ -1,6 +1,6 @@
 package jsx;
 
-public class EmptyJSX4 {
+public class ChildrenJSX4 {
     public void main(String[] arg) {
         <Tag>
             <Tag>

@@ -1,4 +1,4 @@
-public class MyTest {
+public class JSX1 {
     public void simpleAttributes() {
 
         <Dropdown >
