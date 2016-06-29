@@ -52,6 +52,7 @@ import com.github.javaparser.ast.comments.*;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
+import com.github.javaparser.ast.jsx.*;
 
 /**
  * <p>This class was generated automatically by javacc, do not edit.</p>
@@ -3188,7 +3189,10 @@ TryStmt TryStatement():
 
 Statement JSXElement():
 {
-	List stmts;
+    String name;
+    List attributes;
+	List children = new LinkedList();
+	boolean oneTag = false;
 	int beginLine;
 	int beginColumn;
 	StringBuilder openTag = new StringBuilder();
@@ -3196,9 +3200,9 @@ Statement JSXElement():
 }
 {
    "<" {beginLine=token.beginLine; beginColumn=token.beginColumn;}
-   <IDENTIFIER> { openTag.append(token.image); } [("." | ":") { openTag.append(token.image); } <IDENTIFIER> { openTag.append(token.image); }] JSXAttributes()
+   <IDENTIFIER> { openTag.append(token.image); } [("." | ":") { openTag.append(token.image); } <IDENTIFIER> { openTag.append(token.image); }] attributes = JSXAttributes()
    (
-      "/>"
+      "/>" { oneTag = true; }
       |
        (">" (JSXChild())* "</"<IDENTIFIER> { closeTag.append(token.image); } [("." | ":") { closeTag.append(token.image); } <IDENTIFIER> { closeTag.append(token.image); }] ">") {
         if(!openTag.toString().equals(closeTag.toString())) {
@@ -3207,7 +3211,7 @@ Statement JSXElement():
        }
 
    )
-  { return new BlockStmt(beginLine, beginColumn, token.endLine, token.endColumn, new LinkedList()); }
+  { return new JsxElementStmt(beginLine, beginColumn, token.endLine, token.endColumn, openTag.toString(), oneTag, attributes, children); }
 }
 
 void JSXChild(): {}
@@ -3266,89 +3270,114 @@ void JSXTextNode(): {}
     | <REMASSIGN>
     | <ELLIPSIS>
     | <DOUBLECOLON>
-    | < ABSTRACT>
-    | < ASSERT>
-    | < BOOLEAN>
-    | < BREAK>
-    | < BYTE>
-    | < CASE>
-    | < CATCH>
-    | < CHAR>
-    | < CLASS>
-    | < CONST>
-    | < CONTINUE>
-    | < _DEFAULT>
-    | < DO>
-    | < DOUBLE>
-    | < ELSE>
-    | < ENUM>
-    | < EXTENDS>
-    | < FALSE>
-    | < FINAL>
-    | < FINALLY>
-    | < FLOAT>
-    | < FOR>
-    | < GOTO>
-    | < IF>
-    | < IMPLEMENTS>
-    | < IMPORT>
-    | < INSTANCEOF>
-    | < INT>
-    | < INTERFACE>
-    | < LONG>
-    | < NATIVE>
-    | < NEW>
-    | < NULL>
-    | < PACKAGE>
-    | < PRIVATE>
-    | < PROTECTED>
-    | < PUBLIC>
-    | < RETURN>
-    | < SHORT>
-    | < STATIC>
-    | < STRICTFP>
-    | < SUPER>
-    | < SWITCH>
-    | < SYNCHRONIZED>
-    | < THIS>
-    | < THROW>
-    | < THROWS>
-    | < TRANSIENT>
-    | < TRUE>
-    | < TRY>
-    | < VOID>
-    | < VOLATILE>
-    | < WHILE>
+    | <ABSTRACT>
+    | <ASSERT>
+    | <BOOLEAN>
+    | <BREAK>
+    | <BYTE>
+    | <CASE>
+    | <CATCH>
+    | <CHAR>
+    | <CLASS>
+    | <CONST>
+    | <CONTINUE>
+    | <_DEFAULT>
+    | <DO>
+    | <DOUBLE>
+    | <ELSE>
+    | <ENUM>
+    | <EXTENDS>
+    | <FALSE>
+    | <FINAL>
+    | <FINALLY>
+    | <FLOAT>
+    | <FOR>
+    | <GOTO>
+    | <IF>
+    | <IMPLEMENTS>
+    | <IMPORT>
+    | <INSTANCEOF>
+    | <INT>
+    | <INTERFACE>
+    | <LONG>
+    | <NATIVE>
+    | <NEW>
+    | <NULL>
+    | <PACKAGE>
+    | <PRIVATE>
+    | <PROTECTED>
+    | <PUBLIC>
+    | <RETURN>
+    | <SHORT>
+    | <STATIC>
+    | <STRICTFP>
+    | <SUPER>
+    | <SWITCH>
+    | <SYNCHRONIZED>
+    | <THIS>
+    | <THROW>
+    | <THROWS>
+    | <TRANSIENT>
+    | <TRUE>
+    | <TRY>
+    | <VOID>
+    | <VOLATILE>
+    | <WHILE>
     | <~["{","}","<",">"]>
   )+
 }
 
-void JSXAttributes() : {}
+List JSXAttributes() :
 {
-    (JSXAttribute())*
+    List attributes = new LinkedList();
+    JsxElementAttribute attribute;
+}
+{
+    (attribute = JSXAttribute() { attributes.add(attribute); } )*
+    { return attributes; }
 }
 
-void JSXAttribute() : {}
+JsxElementAttribute JSXAttribute() :
 {
-    JSXAttributeName() <ASSIGN>
+    JsxElementAttribute attribute;
+    int beginLine;
+    int beginColumn;
+    String name;
+    JsxExpression value = null;
+}
+{
+    name = JSXAttributeName() { beginLine=token.beginLine; beginColumn=token.beginColumn;} <ASSIGN>
     (
         <STRING_LITERAL>
       | <CHARACTER_LITERAL>
       | <JSX_SINGLE_STRING>
       | <JSX_DOUBLE_STRING>
-      | JSXExpression()
+      | value = JSXExpression()
     )
+    { return new JsxElementAttribute(beginLine, beginColumn, token.endLine, token.endColumn, name, value); }
 }
 
-void JSXAttributeName(): {}
+String JSXAttributeName():
 {
-    LOOKAHEAD(3) (<IDENTIFIER> <COLON> <IDENTIFIER>)
-    | <IDENTIFIER> (<DOT> <IDENTIFIER>)*
+	StringBuilder name = new StringBuilder();
+}
+{
+    (
+        LOOKAHEAD(3) (<IDENTIFIER> <COLON> <IDENTIFIER>)  { name.append(token.image); }
+      | <IDENTIFIER> (<DOT> <IDENTIFIER>)*  { name.append(token.image); }
+    )
+    { return name.toString(); }
 }
 
-void JSXExpression() : {}
+JsxExpression JSXExpression() :
 {
-    (<LBRACE> Expression() <RBRACE>)
+    Expression expression;
+    int beginLine;
+    int beginColumn;
+}
+{
+    (<LBRACE> { beginLine=token.beginLine; beginColumn=token.beginColumn;} expression = Expression() <RBRACE>)
+    { return new JsxExpression(beginLine, beginColumn, token.endLine, token.endColumn, expression); }
 }
 
 List ResourceSpecification() :
