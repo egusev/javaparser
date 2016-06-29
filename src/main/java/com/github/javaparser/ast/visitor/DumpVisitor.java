@@ -31,6 +31,7 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.jsx.JsxElementAttribute;
 import com.github.javaparser.ast.jsx.JsxElementStmt;
 import com.github.javaparser.ast.jsx.JsxExpression;
+import com.github.javaparser.ast.jsx.JsxText;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 
@@ -1751,13 +1752,19 @@ public class DumpVisitor implements VoidVisitor<Object> {
         printer.print("<");
         printer.print(n.getName());
         for (JsxElementAttribute attribute : n.getAttributes()) {
-            System.err.println(attribute);
             printer.print(" ");
             attribute.accept(this, arg);
         }
-        printer.print(n.isOneTag() ? "/>" : ">");
 
-        if (!n.isOneTag()) {
+        if (n.isOneTag()) {
+            printer.print("/>");
+        }
+        else {
+            printer.print(">");
+            for (Node node : n.getChildren()) {
+                node.accept(this, arg);
+            }
+
             printer.print("</");
             printer.print(n.getName());
             printer.print(">");
@@ -1778,5 +1785,10 @@ public class DumpVisitor implements VoidVisitor<Object> {
         printer.print("{");
         n.getExpression().accept(this, arg);
         printer.print("}");
+    }
+
+    @Override
+    public void visit(JsxText n, Object arg) {
+        printer.print(n.getText());
     }
 }

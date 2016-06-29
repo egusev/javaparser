@@ -34,6 +34,7 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.jsx.JsxElementAttribute;
 import com.github.javaparser.ast.jsx.JsxElementStmt;
 import com.github.javaparser.ast.jsx.JsxExpression;
+import com.github.javaparser.ast.jsx.JsxText;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 
@@ -919,6 +920,13 @@ public abstract class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 
     @Override
     public void visit(JsxExpression n, A arg) {
+        if (n != null) {
+            n.accept(this, arg);
+        }
+    }
+
+    @Override
+    public void visit(JsxText n, A arg) {
         if (n != null) {
             n.accept(this, arg);
         }

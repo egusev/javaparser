@@ -33,6 +33,7 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.jsx.JsxElementAttribute;
 import com.github.javaparser.ast.jsx.JsxElementStmt;
 import com.github.javaparser.ast.jsx.JsxExpression;
+import com.github.javaparser.ast.jsx.JsxText;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 
@@ -232,4 +233,6 @@ public interface VoidVisitor<A> {
 	void visit(JsxElementAttribute n, A arg);
 
 	void visit(JsxExpression n, A arg);
+
+	void visit(JsxText n, A arg);
 }

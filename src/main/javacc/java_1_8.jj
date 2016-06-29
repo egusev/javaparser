@@ -3197,6 +3197,7 @@ Statement JSXElement():
 	int beginColumn;
 	StringBuilder openTag = new StringBuilder();
 	StringBuilder closeTag = new StringBuilder();
+	Node node;
 }
 {
    "<" {beginLine=token.beginLine; beginColumn=token.beginColumn;}
@@ -3204,7 +3205,7 @@ Statement JSXElement():
    (
       "/>" { oneTag = true; }
       |
-       (">" (JSXChild())* "</"<IDENTIFIER> { closeTag.append(token.image); } [("." | ":") { closeTag.append(token.image); } <IDENTIFIER> { closeTag.append(token.image); }] ">") {
+       (">" ( node = JSXChild() { children.add(node); } )* "</"<IDENTIFIER> { closeTag.append(token.image); } [("." | ":") { closeTag.append(token.image); } <IDENTIFIER> { closeTag.append(token.image); }] ">") {
         if(!openTag.toString().equals(closeTag.toString())) {
             throw new ParseException("Open and close tags should match, but open tag was " + openTag.toString() + " and close tag was " + closeTag.toString());
         }
@@ -3214,15 +3215,28 @@ Statement JSXElement():
   { return new JsxElementStmt(beginLine, beginColumn, token.endLine, token.endColumn, openTag.toString(), oneTag, attributes, children); }
 }
 
-void JSXChild(): {}
+Node JSXChild():
 {
-    JSXTextNode()
-   | JSXElement()
-   | JSXExpression()
+    Node child;
+}
+{
+  (
+    child = JSXTextNode()
+   | child = JSXElement()
+   | child = JSXExpression()
+  )
+  { return child; }
 }
 
-void JSXTextNode(): {}
+Node JSXTextNode():
 {
+	StringBuilder text = new StringBuilder();
+    int beginLine = 0;
+    int beginColumn = 0;
+    boolean first = true;
+}
+{
+  (
   (
       <IDENTIFIER>
     | <LONG_LITERAL>
@@ -3324,7 +3338,9 @@ void JSXTextNode(): {}
     | <VOLATILE>
     | <WHILE>
     | <~["{","}","<",">"]>
+  ) { if (first) {beginLine=token.beginLine; beginColumn=token.beginColumn; first = false; }  text.append(token.image); }
   )+
+  { return new JsxText(beginLine, beginColumn, token.endLine, token.endColumn, text.toString()); }
 }
 
 List JSXAttributes() :
