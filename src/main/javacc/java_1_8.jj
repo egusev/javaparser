@@ -3363,8 +3363,8 @@ String JSXAttributeName():
 }
 {
     (
-        LOOKAHEAD(3) (<IDENTIFIER> <COLON> <IDENTIFIER>)  { name.append(token.image); }
-      | <IDENTIFIER> (<DOT> <IDENTIFIER>)*  { name.append(token.image); }
+        LOOKAHEAD(3) (<IDENTIFIER> { name.append(token.image); } <COLON> { name.append(token.image); } <IDENTIFIER> { name.append(token.image); } )
+      | <IDENTIFIER> { name.append(token.image); } (<DOT> { name.append(token.image); } <IDENTIFIER> { name.append(token.image); })*
     )
     { return name.toString(); }
 }
