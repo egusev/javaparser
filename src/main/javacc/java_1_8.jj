@@ -1163,6 +1163,13 @@ TOKEN :
 | < GT: ">" >
 }
 
+<JSX_TEXT>
+TOKEN : {
+  < JSX_START_OPEN: "<" > : DEFAULT
+| < JSX_START_CLOSE: "</" > : DEFAULT
+| < JSX_LBRACE: "{" > :DEFAULT
+| < TEXT: (~["<", ">", "{", "}"])+ >
+}
 
 /*****************************************
  * THE JAVA LANGUAGE GRAMMAR STARTS HERE *
@@ -3200,12 +3207,12 @@ Statement JSXElement():
 	Node node;
 }
 {
-   "<" {beginLine=token.beginLine; beginColumn=token.beginColumn;}
+   ("<" | <JSX_START_OPEN>) {beginLine=token.beginLine; beginColumn=token.beginColumn;}
    <IDENTIFIER> { openTag.append(token.image); } [("." | ":") { openTag.append(token.image); } <IDENTIFIER> { openTag.append(token.image); }] attributes = JSXAttributes()
    (
       "/>" { oneTag = true; }
       |
-       (">" ( node = JSXChild() { children.add(node); } )* "</"<IDENTIFIER> { closeTag.append(token.image); } [("." | ":") { closeTag.append(token.image); } <IDENTIFIER> { closeTag.append(token.image); }] ">") {
+       (">" {  token_source.SwitchTo(JSX_TEXT); } ( node = JSXChild() { children.add(node); } )* (<JSX_START_CLOSE> | "</") <IDENTIFIER> { closeTag.append(token.image); } [("." | ":") { closeTag.append(token.image); } <IDENTIFIER> { closeTag.append(token.image); }] ">") {
         if(!openTag.toString().equals(closeTag.toString())) {
             throw new ParseException("Open and close tags should match, but open tag was " + openTag.toString() + " and close tag was " + closeTag.toString());
         }
@@ -3223,7 +3230,7 @@ Node JSXChild():
   (
     child = JSXTextNode()
    | child = JSXElement()
-   | child = JSXExpression()
+   | child = JSXExpression() {  token_source.SwitchTo(JSX_TEXT); }
   )
   { return child; }
 }
@@ -3238,106 +3245,7 @@ Node JSXTextNode():
 {
   (
   (
-      <IDENTIFIER>
-    | <LONG_LITERAL>
-    | <INTEGER_LITERAL>
-    | <FLOATING_POINT_LITERAL>
-    | <CHARACTER_LITERAL>
-    | <STRING_LITERAL>
-    | <LPAREN>
-    | <RPAREN>
-    | <LBRACKET>
-    | <RBRACKET>
-    | <SEMICOLON>
-    | <COMMA>
-    | <DOT>
-    | <AT>
-    | <ASSIGN>
-    | <BANG>
-    | <TILDE>
-    | <HOOK>
-    | <COLON>
-    | <EQ>
-    | <LE>
-    | <GE>
-    | <NE>
-    | <SC_OR>
-    | <SC_AND>
-    | <INCR>
-    | <DECR>
-    | <PLUS>
-    | <MINUS>
-    | <STAR>
-    | <SLASH>
-    | <BIT_AND>
-    | <BIT_OR>
-    | <XOR>
-    | <REM>
-    | <LSHIFT>
-    | <PLUSASSIGN>
-    | <MINUSASSIGN>
-    | <STARASSIGN>
-    | <SLASHASSIGN>
-    | <ANDASSIGN>
-    | <ORASSIGN>
-    | <XORASSIGN>
-    | <REMASSIGN>
-    | <ELLIPSIS>
-    | <DOUBLECOLON>
-    | <ABSTRACT>
-    | <ASSERT>
-    | <BOOLEAN>
-    | <BREAK>
-    | <BYTE>
-    | <CASE>
-    | <CATCH>
-    | <CHAR>
-    | <CLASS>
-    | <CONST>
-    | <CONTINUE>
-    | <_DEFAULT>
-    | <DO>
-    | <DOUBLE>
-    | <ELSE>
-    | <ENUM>
-    | <EXTENDS>
-    | <FALSE>
-    | <FINAL>
-    | <FINALLY>
-    | <FLOAT>
-    | <FOR>
-    | <GOTO>
-    | <IF>
-    | <IMPLEMENTS>
-    | <IMPORT>
-    | <INSTANCEOF>
-    | <INT>
-    | <INTERFACE>
-    | <LONG>
-    | <NATIVE>
-    | <NEW>
-    | <NULL>
-    | <PACKAGE>
-    | <PRIVATE>
-    | <PROTECTED>
-    | <PUBLIC>
-    | <RETURN>
-    | <SHORT>
-    | <STATIC>
-    | <STRICTFP>
-    | <SUPER>
-    | <SWITCH>
-    | <SYNCHRONIZED>
-    | <THIS>
-    | <THROW>
-    | <THROWS>
-    | <TRANSIENT>
-    | <TRUE>
-    | <TRY>
-    | <VOID>
-    | <VOLATILE>
-    | <WHILE>
-    | <~["{","}","<",">"]>
+    <TEXT>
   ) { if (first) {beginLine=token.beginLine; beginColumn=token.beginColumn; first = false; }  text.append(token.image); }
   )+
   { return new JsxText(beginLine, beginColumn, token.endLine, token.endColumn, text.toString()); }
@@ -3392,7 +3300,7 @@ JsxExpression JSXExpression() :
     int beginColumn;
 }
 {
-    (<LBRACE> { beginLine=token.beginLine; beginColumn=token.beginColumn;} expression = Expression() <RBRACE>)
+    ( (<LBRACE> | <JSX_LBRACE>) { beginLine=token.beginLine; beginColumn=token.beginColumn;} expression = Expression() <RBRACE>)
     { return new JsxExpression(beginLine, beginColumn, token.endLine, token.endColumn, expression); }
 }
 
