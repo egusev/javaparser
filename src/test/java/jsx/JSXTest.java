@@ -36,6 +36,7 @@ public class JSXTest {
     public void testSuccess(String resource) throws Exception {
         try (InputStream in = JSXTest.class.getResourceAsStream(resource)) {
             CompilationUnit cu = JavaParser.parse(in);
+            System.out.println(cu.toString());
         }
     }
 
