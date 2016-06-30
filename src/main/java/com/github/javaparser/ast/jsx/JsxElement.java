@@ -34,7 +34,7 @@ public final class JsxElement extends JsxNode {
 
     private boolean oneTag;
 
-    private List<JsxElementAttribute> attributes;
+    private List<JsxAttribute> attributes;
 
     private List<JsxNode> children;
 
@@ -42,7 +42,7 @@ public final class JsxElement extends JsxNode {
                       final int endLine, final int endColumn,
                       final String name,
                       final boolean oneTag,
-                      final List<JsxElementAttribute> attributes,
+                      final List<JsxAttribute> attributes,
                       final List<JsxNode> children) {
         super(beginLine, beginColumn, endLine, endColumn);
         setChildren(children);
@@ -68,17 +68,17 @@ public final class JsxElement extends JsxNode {
     }
 
     public void setChildren(final List<JsxNode> children) {
-        this.children = children;
+        this.children = ensureNotNull(children);
         setAsParentNodeOf(this.children);
     }
 
-    public List<JsxElementAttribute> getAttributes() {
+    public List<JsxAttribute> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(List<JsxElementAttribute> attributes) {
-        attributes = ensureNotNull(attributes);
-        this.attributes = attributes;
+    public void setAttributes(List<JsxAttribute> attributes) {
+        this.attributes = ensureNotNull(attributes);
+        setAsParentNodeOf(this.attributes);
     }
 
     public String getName() {

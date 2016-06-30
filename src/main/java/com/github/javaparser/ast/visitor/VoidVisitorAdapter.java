@@ -916,7 +916,7 @@ public abstract class VoidVisitorAdapter<A> implements VoidVisitor<A> {
     }
 
     @Override
-    public void visit(JsxElementAttribute n, A arg) {
+    public void visit(JsxAttribute n, A arg) {
         if (n != null) {
             n.accept(this, arg);
         }
@@ -931,6 +931,13 @@ public abstract class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 
     @Override
     public void visit(JsxText n, A arg) {
+        if (n != null) {
+            n.accept(this, arg);
+        }
+    }
+
+    @Override
+    public void visit(JsxStringValue n, A arg) {
         if (n != null) {
             n.accept(this, arg);
         }

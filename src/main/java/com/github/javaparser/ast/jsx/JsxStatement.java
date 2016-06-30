@@ -35,6 +35,7 @@ public final class JsxStatement extends Statement {
                         final JsxNode root) {
         super(beginLine, beginColumn, endLine, endColumn);
         this.root = root;
+        setAsParentNodeOf(root);
     }
 
     @Override

@@ -7,7 +7,7 @@ import com.github.javaparser.ast.visitor.VoidVisitor;
 /**
  * Created by eugene on 29/06/16.
  */
-public class JsxExpression extends JsxNode {
+public class JsxExpression extends JsxValue {
     private Expression expression;
 
     public JsxExpression(int beginLine,
@@ -17,6 +17,7 @@ public class JsxExpression extends JsxNode {
                          Expression expression) {
         super(beginLine, beginColumn, endLine, endColumn);
         this.expression = expression;
+        setAsParentNodeOf(expression);
     }
 
     /**
