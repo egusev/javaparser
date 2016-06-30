@@ -28,10 +28,7 @@ import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.comments.LineComment;
 import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.jsx.JsxElementAttribute;
-import com.github.javaparser.ast.jsx.JsxElementStmt;
-import com.github.javaparser.ast.jsx.JsxExpression;
-import com.github.javaparser.ast.jsx.JsxText;
+import com.github.javaparser.ast.jsx.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 
@@ -1748,7 +1745,12 @@ public class DumpVisitor implements VoidVisitor<Object> {
     }
 
     @Override
-    public void visit(final JsxElementStmt n, final Object arg) {
+    public void visit(JsxStatement n, Object arg) {
+        n.getRoot().accept(this, arg);
+    }
+
+    @Override
+    public void visit(final JsxElement n, final Object arg) {
         printer.print("<");
         printer.print(n.getName());
         for (JsxElementAttribute attribute : n.getAttributes()) {
