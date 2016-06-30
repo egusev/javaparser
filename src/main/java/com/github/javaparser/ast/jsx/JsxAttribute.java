@@ -24,17 +24,17 @@ package com.github.javaparser.ast.jsx;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 
-public final class JsxElementAttribute extends JsxNode {
+public final class JsxAttribute extends JsxNode {
 
     private String name;
-    private JsxExpression value;
+    private JsxValue value;
 
-    public JsxElementAttribute(final int beginLine,
-                               final int beginColumn,
-                               final int endLine,
-                               final int endColumn,
-                               final String name,
-                               final JsxExpression value) {
+    public JsxAttribute(final int beginLine,
+                        final int beginColumn,
+                        final int endLine,
+                        final int endColumn,
+                        final String name,
+                        final JsxValue value) {
         super(beginLine, beginColumn, endLine, endColumn);
         this.name = name;
         this.value = value;
@@ -59,7 +59,7 @@ public final class JsxElementAttribute extends JsxNode {
         this.name = name;
     }
 
-    public JsxExpression getValue() {
+    public JsxValue getValue() {
         return value;
     }
 

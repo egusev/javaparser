@@ -1753,7 +1753,7 @@ public class DumpVisitor implements VoidVisitor<Object> {
     public void visit(final JsxElement n, final Object arg) {
         printer.print("<");
         printer.print(n.getName());
-        for (JsxElementAttribute attribute : n.getAttributes()) {
+        for (JsxAttribute attribute : n.getAttributes()) {
             printer.print(" ");
             attribute.accept(this, arg);
         }
@@ -1774,7 +1774,7 @@ public class DumpVisitor implements VoidVisitor<Object> {
     }
 
     @Override
-    public void visit(JsxElementAttribute n, Object arg) {
+    public void visit(JsxAttribute n, Object arg) {
         printer.print(n.getName());
         printer.print("=");
         if (n.getValue() != null) {
@@ -1792,5 +1792,12 @@ public class DumpVisitor implements VoidVisitor<Object> {
     @Override
     public void visit(JsxText n, Object arg) {
         printer.print(n.getText());
+    }
+
+    @Override
+    public void visit(JsxStringValue n, Object arg) {
+        printer.print(n.getSymbol());
+        printer.print(n.getValue());
+        printer.print(n.getSymbol());
     }
 }

@@ -229,9 +229,11 @@ public interface VoidVisitor<A> {
 
 	void visit(JsxElement n, A arg);
 
-	void visit(JsxElementAttribute n, A arg);
+	void visit(JsxAttribute n, A arg);
 
 	void visit(JsxExpression n, A arg);
 
 	void visit(JsxText n, A arg);
+
+	void visit(JsxStringValue n, A arg);
 }

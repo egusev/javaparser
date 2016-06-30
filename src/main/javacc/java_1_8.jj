@@ -3291,31 +3291,33 @@ JsxNode JSXTextNode():
 List JSXAttributes() :
 {
     List attributes = new LinkedList();
-    JsxElementAttribute attribute;
+    JsxAttribute attribute;
 }
 {
     (attribute = JSXAttribute() { attributes.add(attribute); } )*
     { return attributes; }
 }
 
-JsxElementAttribute JSXAttribute() :
+JsxAttribute JSXAttribute() :
 {
-    JsxElementAttribute attribute;
+    JsxAttribute attribute;
     int beginLine;
     int beginColumn;
     String name;
-    JsxExpression value = null;
+    JsxValue value = null;
 }
 {
     name = JSXAttributeName() { beginLine=token.beginLine; beginColumn=token.beginColumn;} <ASSIGN>
     (
+      (
         <STRING_LITERAL>
       | <CHARACTER_LITERAL>
       | <JSX_SINGLE_STRING>
       | <JSX_DOUBLE_STRING>
+      ) { value = new JsxStringValue(beginLine, beginColumn, token.endLine, token.endColumn, token.image); }
       | value = JSXExpression()
     )
-    { return new JsxElementAttribute(beginLine, beginColumn, token.endLine, token.endColumn, name, value); }
+    { return new JsxAttribute(beginLine, beginColumn, token.endLine, token.endColumn, name, value); }
 }
 
 String JSXAttributeName():
