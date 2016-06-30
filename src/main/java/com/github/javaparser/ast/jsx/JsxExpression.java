@@ -1,6 +1,5 @@
 package com.github.javaparser.ast.jsx;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
@@ -8,7 +7,7 @@ import com.github.javaparser.ast.visitor.VoidVisitor;
 /**
  * Created by eugene on 29/06/16.
  */
-public class JsxExpression extends Node {
+public class JsxExpression extends JsxNode {
     private Expression expression;
 
     public JsxExpression(int beginLine,

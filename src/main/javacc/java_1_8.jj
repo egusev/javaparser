@@ -175,7 +175,7 @@ final class ASTParser {
 PARSER_END(ASTParser)
 
 /* WHITE SPACE */
-
+<DEFAULT, JSX>
 SKIP :
 {
   " "
@@ -373,18 +373,10 @@ TOKEN :
       )*
       "\""
   >
-|
-  < JSX_SINGLE_STRING:
-    "'" (~["'"])* "'"
-  >
-|
-  < JSX_DOUBLE_STRING:
-    "\"" (~["\""])* "\""
-  >
 }
 
 /* IDENTIFIERS */
-
+<DEFAULT, JSX>
 TOKEN :
 {
   < IDENTIFIER: <LETTER> (<PART_LETTER>)* >
@@ -1087,7 +1079,6 @@ TOKEN :
 }
 
 /* SEPARATORS */
-
 TOKEN :
 {
   < LPAREN: "(" >
@@ -1103,7 +1094,6 @@ TOKEN :
 }
 
 /* OPERATORS */
-
 TOKEN :
 {
   < ASSIGN: "=" >
@@ -1161,6 +1151,16 @@ TOKEN :
      input_stream.backup(1);
   }
 | < GT: ">" >
+}
+
+<JSX>
+TOKEN : {
+  < JSX_SINGLE_STRING: "'" (~["'"])* "'" >
+| < JSX_DOUBLE_STRING: "\"" (~["\""])* "\"" >
+| < JSX_START_OPENTAG: "<" >
+| < JSX_START_CLOSETAG: "</" >
+| < JSX_END_TAG: ">" >
+| < JSX_END_SELFCLOSE: "/>" >
 }
 
 
@@ -2764,7 +2764,7 @@ Statement Statement():
 	|
 	  ret = TryStatement()
 	|
-	  ret = JSXElement()
+	  ret = JSXStatement()
   )
   { return ret; }
 }
@@ -3187,7 +3187,8 @@ TryStmt TryStatement():
   { return new TryStmt(line, column, token.endLine, token.endColumn, resources, tryBlock, catchs, finallyBlock); }
 }
 
-Statement JSXElement():
+
+JsxStatement JSXStatement():
 {
     String name;
     List attributes;
@@ -3197,27 +3198,57 @@ Statement JSXElement():
 	int beginColumn;
 	StringBuilder openTag = new StringBuilder();
 	StringBuilder closeTag = new StringBuilder();
-	Node node;
+	JsxNode node;
+	JsxElement root;
+}
+{
+   "<" { beginLine=token.beginLine; beginColumn=token.beginColumn;  token_source.SwitchTo(JSX) ; }
+   <IDENTIFIER> { openTag.append(token.image); } [("." | ":") { openTag.append(token.image); } <IDENTIFIER> { openTag.append(token.image); }] attributes = JSXAttributes()
+   (
+       ("JSX_END_TAG" ( node = JSXChild() { children.add(node); } )* <JSX_START_CLOSETAG> <IDENTIFIER> { closeTag.append(token.image); } [("." | ":") { closeTag.append(token.image); } <IDENTIFIER> { closeTag.append(token.image); }] <JSX_END_TAG>) {
+        if(!openTag.toString().equals(closeTag.toString())) {
+            throw new ParseException("Open and close tags should match, but open tag was " + openTag.toString() + " and close tag was " + closeTag.toString());
+        }
+       }
+   )
+  {
+    root = new JsxElement(beginLine, beginColumn, token.endLine, token.endColumn, openTag.toString(), oneTag, attributes, children);
+    token_source.SwitchTo(DEFAULT);
+    return new JsxStatement(beginLine, beginColumn, token.endLine, token.endColumn, root);
+  }
+}
+
+JsxElement JSXElement():
+{
+    String name;
+    List attributes;
+	List children = new LinkedList();
+	boolean oneTag = false;
+	int beginLine;
+	int beginColumn;
+	StringBuilder openTag = new StringBuilder();
+	StringBuilder closeTag = new StringBuilder();
+	JsxNode node;
 }
 {
    "<" {beginLine=token.beginLine; beginColumn=token.beginColumn;}
-   <IDENTIFIER> { openTag.append(token.image); } [("." | ":") { openTag.append(token.image); } <IDENTIFIER> { openTag.append(token.image); }] attributes = JSXAttributes()
+   <IDENTIFIER> { openTag.append(token.image); } [(<"."> | <":">) { openTag.append(token.image); } <IDENTIFIER> { openTag.append(token.image); }] attributes = JSXAttributes()
    (
-      "/>" { oneTag = true; }
+      <"/>"> { oneTag = true; }
       |
-       (">" ( node = JSXChild() { children.add(node); } )* "</"<IDENTIFIER> { closeTag.append(token.image); } [("." | ":") { closeTag.append(token.image); } <IDENTIFIER> { closeTag.append(token.image); }] ">") {
+       (">" ( node = JSXChild() { children.add(node); } )* <"</"> <IDENTIFIER> { closeTag.append(token.image); } [("." | ":") { closeTag.append(token.image); } <IDENTIFIER> { closeTag.append(token.image); }] ">") {
         if(!openTag.toString().equals(closeTag.toString())) {
             throw new ParseException("Open and close tags should match, but open tag was " + openTag.toString() + " and close tag was " + closeTag.toString());
         }
        }
 
    )
-  { return new JsxElementStmt(beginLine, beginColumn, token.endLine, token.endColumn, openTag.toString(), oneTag, attributes, children); }
+  { return new JsxElement(beginLine, beginColumn, token.endLine, token.endColumn, openTag.toString(), oneTag, attributes, children); }
 }
 
-Node JSXChild():
+JsxNode JSXChild():
 {
-    Node child;
+    JsxNode child;
 }
 {
   (
@@ -3228,7 +3259,7 @@ Node JSXChild():
   { return child; }
 }
 
-Node JSXTextNode():
+JsxNode JSXTextNode():
 {
 	StringBuilder text = new StringBuilder();
     int beginLine = 0;
@@ -3237,107 +3268,7 @@ Node JSXTextNode():
 }
 {
   (
-  (
-      <IDENTIFIER>
-    | <LONG_LITERAL>
-    | <INTEGER_LITERAL>
-    | <FLOATING_POINT_LITERAL>
-    | <CHARACTER_LITERAL>
-    | <STRING_LITERAL>
-    | <LPAREN>
-    | <RPAREN>
-    | <LBRACKET>
-    | <RBRACKET>
-    | <SEMICOLON>
-    | <COMMA>
-    | <DOT>
-    | <AT>
-    | <ASSIGN>
-    | <BANG>
-    | <TILDE>
-    | <HOOK>
-    | <COLON>
-    | <EQ>
-    | <LE>
-    | <GE>
-    | <NE>
-    | <SC_OR>
-    | <SC_AND>
-    | <INCR>
-    | <DECR>
-    | <PLUS>
-    | <MINUS>
-    | <STAR>
-    | <SLASH>
-    | <BIT_AND>
-    | <BIT_OR>
-    | <XOR>
-    | <REM>
-    | <LSHIFT>
-    | <PLUSASSIGN>
-    | <MINUSASSIGN>
-    | <STARASSIGN>
-    | <SLASHASSIGN>
-    | <ANDASSIGN>
-    | <ORASSIGN>
-    | <XORASSIGN>
-    | <REMASSIGN>
-    | <ELLIPSIS>
-    | <DOUBLECOLON>
-    | <ABSTRACT>
-    | <ASSERT>
-    | <BOOLEAN>
-    | <BREAK>
-    | <BYTE>
-    | <CASE>
-    | <CATCH>
-    | <CHAR>
-    | <CLASS>
-    | <CONST>
-    | <CONTINUE>
-    | <_DEFAULT>
-    | <DO>
-    | <DOUBLE>
-    | <ELSE>
-    | <ENUM>
-    | <EXTENDS>
-    | <FALSE>
-    | <FINAL>
-    | <FINALLY>
-    | <FLOAT>
-    | <FOR>
-    | <GOTO>
-    | <IF>
-    | <IMPLEMENTS>
-    | <IMPORT>
-    | <INSTANCEOF>
-    | <INT>
-    | <INTERFACE>
-    | <LONG>
-    | <NATIVE>
-    | <NEW>
-    | <NULL>
-    | <PACKAGE>
-    | <PRIVATE>
-    | <PROTECTED>
-    | <PUBLIC>
-    | <RETURN>
-    | <SHORT>
-    | <STATIC>
-    | <STRICTFP>
-    | <SUPER>
-    | <SWITCH>
-    | <SYNCHRONIZED>
-    | <THIS>
-    | <THROW>
-    | <THROWS>
-    | <TRANSIENT>
-    | <TRUE>
-    | <TRY>
-    | <VOID>
-    | <VOLATILE>
-    | <WHILE>
-    | <~["{","}","<",">"]>
+  (<~["{","}","<",">"]>
   ) { if (first) {beginLine=token.beginLine; beginColumn=token.beginColumn; first = false; }  text.append(token.image); }
   )+
   { return new JsxText(beginLine, beginColumn, token.endLine, token.endColumn, text.toString()); }
@@ -3379,8 +3310,8 @@ String JSXAttributeName():
 }
 {
     (
-        LOOKAHEAD(3) (<IDENTIFIER> { name.append(token.image); } <COLON> { name.append(token.image); } <IDENTIFIER> { name.append(token.image); } )
-      | <IDENTIFIER> { name.append(token.image); } (<DOT> { name.append(token.image); } <IDENTIFIER> { name.append(token.image); })*
+        LOOKAHEAD(3) (<IDENTIFIER> { name.append(token.image); } ":" { name.append(token.image); } <IDENTIFIER> { name.append(token.image); } )
+      | <IDENTIFIER> { name.append(token.image); } ("." { name.append(token.image); } <IDENTIFIER> { name.append(token.image); })*
     )
     { return name.toString(); }
 }

@@ -21,23 +21,20 @@
 
 package com.github.javaparser.ast.jsx;
 
+import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 
-public final class JsxElementAttribute extends JsxNode {
+public final class JsxStatement extends Statement {
+    private JsxNode root;
 
-    private String name;
-    private JsxExpression value;
-
-    public JsxElementAttribute(final int beginLine,
-                               final int beginColumn,
-                               final int endLine,
-                               final int endColumn,
-                               final String name,
-                               final JsxExpression value) {
+    public JsxStatement(final int beginLine,
+                        final int beginColumn,
+                        final int endLine,
+                        final int endColumn,
+                        final JsxNode root) {
         super(beginLine, beginColumn, endLine, endColumn);
-        this.name = name;
-        this.value = value;
+        this.root = root;
     }
 
     @Override
@@ -51,19 +48,11 @@ public final class JsxElementAttribute extends JsxNode {
         v.visit(this, arg);
     }
 
-    public String getName() {
-        return name;
+    public JsxNode getRoot() {
+        return root;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public JsxExpression getValue() {
-        return value;
-    }
-
-    public void setValue(JsxExpression value) {
-        this.value = value;
+    public void setRoot(JsxNode root) {
+        this.root = root;
     }
 }

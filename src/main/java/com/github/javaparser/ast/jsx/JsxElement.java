@@ -21,7 +21,6 @@
 
 package com.github.javaparser.ast.jsx;
 
-import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 
@@ -29,7 +28,7 @@ import java.util.List;
 
 import static com.github.javaparser.ast.internal.Utils.ensureNotNull;
 
-public final class JsxElementStmt extends Statement {
+public final class JsxElement extends JsxNode {
 
     private String name;
 
@@ -37,14 +36,14 @@ public final class JsxElementStmt extends Statement {
 
     private List<JsxElementAttribute> attributes;
 
-    private List<Statement> children;
+    private List<JsxNode> children;
 
-    public JsxElementStmt(final int beginLine, final int beginColumn,
-                          final int endLine, final int endColumn,
-                          final String name,
-                          final boolean oneTag,
-                          final List<JsxElementAttribute> attributes,
-                          final List<Statement> children) {
+    public JsxElement(final int beginLine, final int beginColumn,
+                      final int endLine, final int endColumn,
+                      final String name,
+                      final boolean oneTag,
+                      final List<JsxElementAttribute> attributes,
+                      final List<JsxNode> children) {
         super(beginLine, beginColumn, endLine, endColumn);
         setChildren(children);
         setAttributes(attributes);
@@ -63,12 +62,12 @@ public final class JsxElementStmt extends Statement {
         v.visit(this, arg);
     }
 
-    public List<Statement> getChildren() {
+    public List<JsxNode> getChildren() {
         children = ensureNotNull(children);
         return children;
     }
 
-    public void setChildren(final List<Statement> children) {
+    public void setChildren(final List<JsxNode> children) {
         this.children = children;
         setAsParentNodeOf(this.children);
     }
