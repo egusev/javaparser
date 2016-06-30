@@ -12,6 +12,7 @@ public class JsxText extends Node {
 
     public JsxText(int beginLine, int beginColumn, int endLine, int endColumn, String text) {
         super(beginLine, beginColumn, endLine, endColumn);
+        this.text = text;
     }
 
     /**
