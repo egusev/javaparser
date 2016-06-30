@@ -1,23 +1,31 @@
 package com.github.javaparser.ast.jsx;
 
-import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 
 /**
- * Created by eugene on 29/06/16.
+ * Created by eugene on 30/06/16.
  */
-public class JsxExpression extends JsxValue {
-    private Expression expression;
+public class JsxStringValue extends JsxValue {
+    private String value;
+    private String symbol;
 
-    public JsxExpression(int beginLine,
-                         int beginColumn,
-                         int endLine,
-                         int endColumn,
-                         Expression expression) {
+    public JsxStringValue(String value) {
+        this.value = value.substring(1, value.length() - 1);
+        symbol = value.substring(0, 1);
+    }
+
+    public JsxStringValue(int beginLine,
+                          int beginColumn,
+                          int endLine,
+                          int endColumn,
+                          String value) {
         super(beginLine, beginColumn, endLine, endColumn);
-        this.expression = expression;
-        setAsParentNodeOf(expression);
+        this.value = value.substring(1, value.length() - 1);
+        symbol = value.substring(0, 1);
+    }
+
+    public JsxStringValue() {
     }
 
     /**
@@ -43,7 +51,11 @@ public class JsxExpression extends JsxValue {
         v.visit(this, arg);
     }
 
-    public Expression getExpression() {
-        return expression;
+    public String getValue() {
+        return value;
+    }
+
+    public String getSymbol() {
+        return symbol;
     }
 }

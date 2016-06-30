@@ -28,10 +28,7 @@ import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.comments.LineComment;
 import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.jsx.JsxElementAttribute;
-import com.github.javaparser.ast.jsx.JsxElementStmt;
-import com.github.javaparser.ast.jsx.JsxExpression;
-import com.github.javaparser.ast.jsx.JsxText;
+import com.github.javaparser.ast.jsx.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 
@@ -1748,10 +1745,15 @@ public class DumpVisitor implements VoidVisitor<Object> {
     }
 
     @Override
-    public void visit(final JsxElementStmt n, final Object arg) {
+    public void visit(JsxStatement n, Object arg) {
+        n.getRoot().accept(this, arg);
+    }
+
+    @Override
+    public void visit(final JsxElement n, final Object arg) {
         printer.print("<");
         printer.print(n.getName());
-        for (JsxElementAttribute attribute : n.getAttributes()) {
+        for (JsxAttribute attribute : n.getAttributes()) {
             printer.print(" ");
             attribute.accept(this, arg);
         }
@@ -1772,7 +1774,7 @@ public class DumpVisitor implements VoidVisitor<Object> {
     }
 
     @Override
-    public void visit(JsxElementAttribute n, Object arg) {
+    public void visit(JsxAttribute n, Object arg) {
         printer.print(n.getName());
         printer.print("=");
         if (n.getValue() != null) {
@@ -1790,5 +1792,12 @@ public class DumpVisitor implements VoidVisitor<Object> {
     @Override
     public void visit(JsxText n, Object arg) {
         printer.print(n.getText());
+    }
+
+    @Override
+    public void visit(JsxStringValue n, Object arg) {
+        printer.print(n.getSymbol());
+        printer.print(n.getValue());
+        printer.print(n.getSymbol());
     }
 }

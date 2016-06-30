@@ -1,13 +1,12 @@
 package com.github.javaparser.ast.jsx;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 
 /**
  * Created by eugene on 29/06/16.
  */
-public class JsxText extends Node {
+public class JsxText extends JsxNode {
     String text;
 
     public JsxText(int beginLine, int beginColumn, int endLine, int endColumn, String text) {

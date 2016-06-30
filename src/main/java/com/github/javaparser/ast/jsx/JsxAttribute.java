@@ -21,35 +21,23 @@
 
 package com.github.javaparser.ast.jsx;
 
-import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 
-import java.util.List;
-
-import static com.github.javaparser.ast.internal.Utils.ensureNotNull;
-
-public final class JsxElementStmt extends Statement {
+public final class JsxAttribute extends JsxNode {
 
     private String name;
+    private JsxValue value;
 
-    private boolean oneTag;
-
-    private List<JsxElementAttribute> attributes;
-
-    private List<Statement> children;
-
-    public JsxElementStmt(final int beginLine, final int beginColumn,
-                          final int endLine, final int endColumn,
-                          final String name,
-                          final boolean oneTag,
-                          final List<JsxElementAttribute> attributes,
-                          final List<Statement> children) {
+    public JsxAttribute(final int beginLine,
+                        final int beginColumn,
+                        final int endLine,
+                        final int endColumn,
+                        final String name,
+                        final JsxValue value) {
         super(beginLine, beginColumn, endLine, endColumn);
-        setChildren(children);
-        setAttributes(attributes);
         this.name = name;
-        this.oneTag = oneTag;
+        this.value = value;
     }
 
     @Override
@@ -63,25 +51,6 @@ public final class JsxElementStmt extends Statement {
         v.visit(this, arg);
     }
 
-    public List<Statement> getChildren() {
-        children = ensureNotNull(children);
-        return children;
-    }
-
-    public void setChildren(final List<Statement> children) {
-        this.children = children;
-        setAsParentNodeOf(this.children);
-    }
-
-    public List<JsxElementAttribute> getAttributes() {
-        return attributes;
-    }
-
-    public void setAttributes(List<JsxElementAttribute> attributes) {
-        attributes = ensureNotNull(attributes);
-        this.attributes = attributes;
-    }
-
     public String getName() {
         return name;
     }
@@ -90,11 +59,11 @@ public final class JsxElementStmt extends Statement {
         this.name = name;
     }
 
-    public boolean isOneTag() {
-        return oneTag;
+    public JsxValue getValue() {
+        return value;
     }
 
-    public void setOneTag(boolean oneTag) {
-        this.oneTag = oneTag;
+    public void setValue(JsxExpression value) {
+        this.value = value;
     }
 }

@@ -31,10 +31,7 @@ import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.comments.LineComment;
 import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.jsx.JsxElementAttribute;
-import com.github.javaparser.ast.jsx.JsxElementStmt;
-import com.github.javaparser.ast.jsx.JsxExpression;
-import com.github.javaparser.ast.jsx.JsxText;
+import com.github.javaparser.ast.jsx.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 
@@ -905,14 +902,21 @@ public abstract class VoidVisitorAdapter<A> implements VoidVisitor<A> {
     }
 
     @Override
-    public void visit(JsxElementStmt n, A arg) {
+    public void visit(JsxStatement n, A arg) {
         if (n != null) {
             n.accept(this, arg);
         }
     }
 
     @Override
-    public void visit(JsxElementAttribute n, A arg) {
+    public void visit(JsxElement n, A arg) {
+        if (n != null) {
+            n.accept(this, arg);
+        }
+    }
+
+    @Override
+    public void visit(JsxAttribute n, A arg) {
         if (n != null) {
             n.accept(this, arg);
         }
@@ -927,6 +931,13 @@ public abstract class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 
     @Override
     public void visit(JsxText n, A arg) {
+        if (n != null) {
+            n.accept(this, arg);
+        }
+    }
+
+    @Override
+    public void visit(JsxStringValue n, A arg) {
         if (n != null) {
             n.accept(this, arg);
         }

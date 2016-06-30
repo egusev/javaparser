@@ -21,24 +21,34 @@
 
 package com.github.javaparser.ast.jsx;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 
-public final class JsxElementAttribute extends Node {
+import java.util.List;
+
+import static com.github.javaparser.ast.internal.Utils.ensureNotNull;
+
+public final class JsxElement extends JsxNode {
 
     private String name;
-    private JsxExpression value;
 
-    public JsxElementAttribute(final int beginLine,
-                               final int beginColumn,
-                               final int endLine,
-                               final int endColumn,
-                               final String name,
-                               final JsxExpression value) {
+    private boolean oneTag;
+
+    private List<JsxAttribute> attributes;
+
+    private List<JsxNode> children;
+
+    public JsxElement(final int beginLine, final int beginColumn,
+                      final int endLine, final int endColumn,
+                      final String name,
+                      final boolean oneTag,
+                      final List<JsxAttribute> attributes,
+                      final List<JsxNode> children) {
         super(beginLine, beginColumn, endLine, endColumn);
+        setChildren(children);
+        setAttributes(attributes);
         this.name = name;
-        this.value = value;
+        this.oneTag = oneTag;
     }
 
     @Override
@@ -52,6 +62,25 @@ public final class JsxElementAttribute extends Node {
         v.visit(this, arg);
     }
 
+    public List<JsxNode> getChildren() {
+        children = ensureNotNull(children);
+        return children;
+    }
+
+    public void setChildren(final List<JsxNode> children) {
+        this.children = ensureNotNull(children);
+        setAsParentNodeOf(this.children);
+    }
+
+    public List<JsxAttribute> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(List<JsxAttribute> attributes) {
+        this.attributes = ensureNotNull(attributes);
+        setAsParentNodeOf(this.attributes);
+    }
+
     public String getName() {
         return name;
     }
@@ -60,11 +89,11 @@ public final class JsxElementAttribute extends Node {
         this.name = name;
     }
 
-    public JsxExpression getValue() {
-        return value;
+    public boolean isOneTag() {
+        return oneTag;
     }
 
-    public void setValue(JsxExpression value) {
-        this.value = value;
+    public void setOneTag(boolean oneTag) {
+        this.oneTag = oneTag;
     }
 }

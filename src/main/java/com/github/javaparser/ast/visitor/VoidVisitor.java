@@ -30,10 +30,7 @@ import com.github.javaparser.ast.comments.BlockComment;
 import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.comments.LineComment;
 import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.jsx.JsxElementAttribute;
-import com.github.javaparser.ast.jsx.JsxElementStmt;
-import com.github.javaparser.ast.jsx.JsxExpression;
-import com.github.javaparser.ast.jsx.JsxText;
+import com.github.javaparser.ast.jsx.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 
@@ -228,11 +225,15 @@ public interface VoidVisitor<A> {
 
 	//- JsxStatements ----------------------------------------
 
-	void visit(JsxElementStmt n, A arg);
+	void visit(JsxStatement n, A arg);
 
-	void visit(JsxElementAttribute n, A arg);
+	void visit(JsxElement n, A arg);
+
+	void visit(JsxAttribute n, A arg);
 
 	void visit(JsxExpression n, A arg);
 
 	void visit(JsxText n, A arg);
+
+	void visit(JsxStringValue n, A arg);
 }
