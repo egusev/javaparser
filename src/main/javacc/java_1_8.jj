@@ -3207,7 +3207,7 @@ JsxStatement JSXStatement():
 	JsxElement root;
 }
 {
-   ("<" | <JSX_START_OPEN>) {beginLine=token.beginLine; beginColumn=token.beginColumn;}
+   ("<" | <JSX_START_OPEN>) { beginLine=token.beginLine; beginColumn=token.beginColumn; }
    <IDENTIFIER> { openTag.append(token.image); } [("." | ":") { openTag.append(token.image); } <IDENTIFIER> { openTag.append(token.image); }] attributes = JSXAttributes()
    (
       "/>" { oneTag = true; }
@@ -3242,7 +3242,7 @@ JsxElement JSXElement():
 	JsxNode node;
 }
 {
-   <JSX_START_OPEN> { beginLine=token.beginLine; beginColumn=token.beginColumn; }
+   ("<" | <JSX_START_OPEN>) { beginLine=token.beginLine; beginColumn=token.beginColumn; }
    <IDENTIFIER> { openTag.append(token.image); } [("." | ":") { openTag.append(token.image); } <IDENTIFIER> { openTag.append(token.image); }] attributes = JSXAttributes()
    (
       "/>" { oneTag = true; }
