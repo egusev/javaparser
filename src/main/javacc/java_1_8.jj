@@ -3201,29 +3201,33 @@ JsxStatement JSXStatement():
 	boolean oneTag = false;
 	int beginLine;
 	int beginColumn;
-	StringBuilder openTag = new StringBuilder();
-	StringBuilder closeTag = new StringBuilder();
+	String openTag;
+	String closeTag;
 	JsxNode node;
 	JsxElement root;
 }
 {
    ("<" | <JSX_START_OPEN>) { beginLine=token.beginLine; beginColumn=token.beginColumn; }
-   <IDENTIFIER> { openTag.append(token.image); } [("." | ":") { openTag.append(token.image); } <IDENTIFIER> { openTag.append(token.image); }] attributes = JSXAttributes()
+   openTag = JSXName()
+   attributes = JSXAttributes()
    (
       "/>" { oneTag = true; }
      |
-      (">" { token_source.SwitchTo(JSX_TEXT); }
-      ( node = JSXChild() { children.add(node); } )*
-      (<JSX_START_CLOSE> | "</")
-      <IDENTIFIER> { closeTag.append(token.image); } [("." | ":") { closeTag.append(token.image); } <IDENTIFIER> { closeTag.append(token.image); }] ">")
+      (
+        ">" { token_source.SwitchTo(JSX_TEXT); }
+        ( node = JSXChild() { children.add(node); } )*
+        (<JSX_START_CLOSE> | "</")
+        closeTag = JSXName()
+        ">"
+      )
       {
-         if(!openTag.toString().equals(closeTag.toString())) {
-             throw new ParseException("Open and close tags should match, but open tag was " + openTag.toString() + " and close tag was " + closeTag.toString());
+         if(!openTag.equals(closeTag)) {
+             throw new ParseException("Open and close tags should match, but open tag was " + openTag + " and close tag was " + closeTag);
          }
       }
    )
   {
-    root = new JsxElement(beginLine, beginColumn, token.endLine, token.endColumn, openTag.toString(), oneTag, attributes, children);
+    root = new JsxElement(beginLine, beginColumn, token.endLine, token.endColumn, openTag, oneTag, attributes, children);
     token_source.SwitchTo(DEFAULT);
     return new JsxStatement(beginLine, beginColumn, token.endLine, token.endColumn, root);
   }
@@ -3237,28 +3241,32 @@ JsxElement JSXElement():
 	boolean oneTag = false;
 	int beginLine;
 	int beginColumn;
-	StringBuilder openTag = new StringBuilder();
-	StringBuilder closeTag = new StringBuilder();
+	String openTag;
+	String closeTag;
 	JsxNode node;
 }
 {
    ("<" | <JSX_START_OPEN>) { beginLine=token.beginLine; beginColumn=token.beginColumn; }
-   <IDENTIFIER> { openTag.append(token.image); } [("." | ":") { openTag.append(token.image); } <IDENTIFIER> { openTag.append(token.image); }] attributes = JSXAttributes()
+   openTag = JSXName()
+   attributes = JSXAttributes()
    (
       "/>" { oneTag = true; }
      |
-      (">" { token_source.SwitchTo(JSX_TEXT); }
-      ( node = JSXChild() { children.add(node); } )*
-      (<JSX_START_CLOSE> | "</")
-      <IDENTIFIER> { closeTag.append(token.image); } [("." | ":") { closeTag.append(token.image); } <IDENTIFIER> { closeTag.append(token.image); }] ">")
+      (
+        ">" { token_source.SwitchTo(JSX_TEXT); }
+        ( node = JSXChild() { children.add(node); } )*
+        (<JSX_START_CLOSE> | "</")
+        closeTag = JSXName()
+        ">"
+      )
       {
-         if(!openTag.toString().equals(closeTag.toString())) {
-             throw new ParseException("Open and close tags should match, but open tag was " + openTag.toString() + " and close tag was " + closeTag.toString());
+         if(!openTag.equals(closeTag)) {
+             throw new ParseException("Open and close tags should match, but open tag was " + openTag + " and close tag was " + closeTag);
          }
          token_source.SwitchTo(JSX_TEXT);
       }
    )
-  { return new JsxElement(beginLine, beginColumn, token.endLine, token.endColumn, openTag.toString(), oneTag, attributes, children); }
+  { return new JsxElement(beginLine, beginColumn, token.endLine, token.endColumn, openTag, oneTag, attributes, children); }
 }
 
 JsxNode JSXChild():
@@ -3307,7 +3315,7 @@ JsxAttribute JSXAttribute() :
     JsxValue value = null;
 }
 {
-    name = JSXAttributeName() { beginLine=token.beginLine; beginColumn=token.beginColumn;} <ASSIGN>
+    name = JSXName() { beginLine=token.beginLine; beginColumn=token.beginColumn;} <ASSIGN>
     (
       (
         <STRING_LITERAL>
@@ -3320,7 +3328,7 @@ JsxAttribute JSXAttribute() :
     { return new JsxAttribute(beginLine, beginColumn, token.endLine, token.endColumn, name, value); }
 }
 
-String JSXAttributeName():
+String JSXName():
 {
 	StringBuilder name = new StringBuilder();
 }
