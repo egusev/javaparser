@@ -21,6 +21,8 @@ public class JSXTest {
             "EmptyJSX3.java",
             "NameSpaceEmptyJSX1.java",
             "NameSpaceEmptyJSX2.java",
+            "NameSpaceEmptyJSX1.java",
+            "NameSpaceEmptyJSX2.java",
             "AttributesJSX1.java",
             "AttributesJSX2.java",
             "AttributesJSX3.java",
@@ -57,6 +59,20 @@ public class JSXTest {
     @Test(expected = com.github.javaparser.ParseException.class)
     public void testFailedEmptyJSX3() throws Exception {
         try (InputStream in = JSXTest.class.getResourceAsStream("FailedEmptyJSX3.java")) {
+            CompilationUnit cu = JavaParser.parse(in);
+        }
+    }
+
+    @Test(expected = com.github.javaparser.ParseException.class)
+    public void testFailedNameJSX1() throws Exception {
+        try (InputStream in = JSXTest.class.getResourceAsStream("FailedNameJSX1.java")) {
+            CompilationUnit cu = JavaParser.parse(in);
+        }
+    }
+
+    @Test(expected = com.github.javaparser.ParseException.class)
+    public void testFailedNameJSX2() throws Exception {
+        try (InputStream in = JSXTest.class.getResourceAsStream("FailedNameJSX2.java")) {
             CompilationUnit cu = JavaParser.parse(in);
         }
     }
